@@ -22,7 +22,9 @@ else
 fi
 
 if [[ "$LIBBPF_ARCH" == s390x ]]; then
-	EXTRA_MFLAGS=(test_verifier)
+	"$VMTEST_ROOT"/build_deps.sh "$VMTEST_ROOT"/config.sh
+	source "$VMTEST_ROOT"/config.sh
+	EXTRA_MFLAGS+=(test_verifier)
 else
 	EXTRA_MFLAGS=()
 fi
