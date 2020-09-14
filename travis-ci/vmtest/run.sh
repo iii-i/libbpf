@@ -289,7 +289,7 @@ fi
 echo "Disk image: $IMG" >&2
 
 tmp=
-ARCH_DIR="$DIR/x86_64"
+ARCH_DIR="$DIR/$LIBBPF_ARCH"
 mkdir -p "$ARCH_DIR"
 mnt="$(mktemp -d -p "$DIR" mnt.XXXXXXXXXX)"
 
@@ -434,10 +434,23 @@ sudo chmod 755 "$mnt/etc/rcS.d/S99-poweroff"
 
 sudo umount "$mnt"
 
-qemu-system-x86_64 -nodefaults -display none -serial mon:stdio \
-	-cpu kvm64 -enable-kvm -smp "$(nproc)" -m 2G \
+case "$LIBBPF_ARCH" in
+s390x)
+	qemu=$VMTEST_ROOT/qemu/install/bin/qemu-system-s390x
+	[[ -e "$qemu" ]] || "$VMTEST_ROOT"/build_qemu.sh "$VMTEST_ROOT"/qemu
+	console="ttyS1"
+	kvm_flags=()
+	;;
+x86_64)
+	qemu="qemu-system-x86_64"
+	console="ttyS0,115200"
+	kvm_flags=(-cpu kvm64 -enable-kvm)
+	;;
+esac
+"$qemu" -nodefaults -display none -serial mon:stdio \
+	"${kvm_flags[@]}" -smp "$(nproc)" -m 2G \
 	-drive file="$IMG",format=raw,index=1,media=disk,if=virtio,cache=none \
-	-kernel "$vmlinuz" -append "root=/dev/vda rw console=ttyS0,115200$APPEND"
+	-kernel "$vmlinuz" -append "root=/dev/vda rw console=$console$APPEND"
 
 sudo mount -o loop "$IMG" "$mnt"
 if exitstatus="$(cat "$mnt/exitstatus" 2>/dev/null)"; then
