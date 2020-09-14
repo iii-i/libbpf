@@ -4,6 +4,20 @@ set -eu
 
 source $(cd $(dirname $0) && pwd)/helpers.sh
 
+if [[ -z ${LIBBPF_ARCH+x} ]]; then
+	echo "LIBBPF_ARCH: x86_64"
+	LIBBPF_ARCH=x86_64
+	export LIBBPF_ARCH
+elif [[ "$LIBBPF_ARCH" == s390x ]]; then
+	echo "LIBBPF_ARCH: s390x"
+	ARCH=s390
+	CROSS_COMPILE=s390x-linux-gnu-
+	export ARCH CROSS_COMPILE
+else
+	echo "Unsupported LIBBPF_ARCH: ${LIBBPF_ARCH}"
+	exit 1
+fi
+
 VMTEST_SETUPCMD="PROJECT_NAME=${PROJECT_NAME} ./${PROJECT_NAME}/travis-ci/vmtest/run_selftests.sh"
 
 echo "KERNEL: $KERNEL"
