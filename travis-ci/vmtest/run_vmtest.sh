@@ -10,6 +10,11 @@ if [[ -z ${LIBBPF_ARCH+x} ]]; then
 	export LIBBPF_ARCH
 elif [[ "$LIBBPF_ARCH" == s390x ]]; then
 	echo "LIBBPF_ARCH: s390x"
+	sudo apt-get install -y \
+		gcc-s390x-linux-gnu \
+		libc6-dev-s390x-cross \
+		libglib2.0-dev \
+		libpixman-1-dev
 	ARCH=s390
 	CROSS_COMPILE=s390x-linux-gnu-
 	export ARCH CROSS_COMPILE
