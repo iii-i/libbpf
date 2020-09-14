@@ -21,6 +21,12 @@ else
 	VMLINUX_H=${VMTEST_ROOT}/vmlinux.h
 fi
 
+if [[ "$LIBBPF_ARCH" == s390x ]]; then
+	EXTRA_MFLAGS=(test_verifier)
+else
+	EXTRA_MFLAGS=()
+fi
+
 make \
 	CLANG=clang-${LLVM_VER} \
 	LLC=llc-${LLVM_VER} \
@@ -28,7 +34,8 @@ make \
 	VMLINUX_BTF="${VMLINUX_BTF}" \
 	VMLINUX_H=${VMLINUX_H} \
 	-C "${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf" \
-	-j $((2*$(nproc)))
+	-j $((2*$(nproc))) \
+	"${EXTRA_MFLAGS[@]}"
 mkdir ${LIBBPF_PATH}/selftests
 cp -R "${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf" \
 	${LIBBPF_PATH}/selftests

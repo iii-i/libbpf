@@ -43,9 +43,9 @@ fi
 
 cd libbpf/selftests/bpf
 
-test_progs
+[[ "$(uname -m)" == s390x ]] || test_progs
 
 if [[ "${KERNEL}" == 'latest' ]]; then
-	test_maps
+	[[ "$(uname -m)" == s390x ]] || test_maps
 	test_verifier
 fi
