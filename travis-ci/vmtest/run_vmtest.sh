@@ -14,10 +14,18 @@ ${VMTEST_ROOT}/build_pahole.sh travis-ci/vmtest/pahole
 
 travis_fold start install_clang "Installing Clang/LLVM"
 
-wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main"
-sudo apt-get update
-sudo apt-get install -y clang-13 lld-13 llvm-13
+if [[ "$(uname -m)" == s390x ]]; then
+  # At this point apt.llvm.org has no s390x packages, so use a PPA
+  sudo add-apt-repository -y ppa:iii-i/llvm-toolchain-systemz
+  sudo apt-get update
+  # lld is not implemented on s390x
+  sudo apt-get -y install clang-13 llvm-13
+else
+  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+  sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main"
+  sudo apt-get update
+  sudo apt-get install -y clang-13 lld-13 llvm-13
+fi
 
 travis_fold end install_clang
 
