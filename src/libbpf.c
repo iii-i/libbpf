@@ -1935,6 +1935,7 @@ static const char *btf_kind_str(const struct btf_type *t)
 	case BTF_KIND_FUNC_PROTO: return "func_proto";
 	case BTF_KIND_VAR: return "var";
 	case BTF_KIND_DATASEC: return "datasec";
+	case BTF_KIND_FLOAT: return "float";
 	default: return "unknown";
 	}
 }
@@ -4940,6 +4941,8 @@ recur:
 		local_id = btf_array(local_type)->type;
 		targ_id = btf_array(targ_type)->type;
 		goto recur;
+	case BTF_KIND_FLOAT:
+		return btf_float_bits(local_type) == btf_float_bits(targ_type);
 	default:
 		pr_warn("unexpected kind %d relocated, local [%d], target [%d]\n",
 			btf_kind(local_type), local_id, targ_id);
@@ -5122,6 +5125,8 @@ recur:
 		skip_mods_and_typedefs(targ_btf, targ_type->type, &targ_id);
 		goto recur;
 	}
+	case BTF_KIND_FLOAT:
+		return btf_float_bits(local_type) == btf_float_bits(targ_type);
 	default:
 		pr_warn("unexpected kind %s relocated, local [%d], target [%d]\n",
 			btf_kind_str(local_type), local_id, targ_id);

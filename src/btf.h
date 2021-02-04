@@ -132,6 +132,9 @@ LIBBPF_API int btf__add_datasec(struct btf *btf, const char *name, __u32 byte_sz
 LIBBPF_API int btf__add_datasec_var_info(struct btf *btf, int var_type_id,
 					 __u32 offset, __u32 byte_sz);
 
+/* float construction APIs */
+LIBBPF_API int btf__add_float(struct btf *btf, const char *name, size_t byte_sz);
+
 struct btf_dedup_opts {
 	unsigned int dedup_table_size;
 	bool dont_resolve_fwds;
@@ -360,6 +363,11 @@ static inline struct btf_var_secinfo *
 btf_var_secinfos(const struct btf_type *t)
 {
 	return (struct btf_var_secinfo *)(t + 1);
+}
+
+static inline __u8 btf_float_bits(const struct btf_type *t)
+{
+	return BTF_FLOAT_BITS(*(__u32 *)(t + 1));
 }
 
 #ifdef __cplusplus
